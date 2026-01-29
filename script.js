@@ -1,7 +1,7 @@
 (function () {
     const CLOUD_URL = 'https://xtiqwwwitvcmbblqqnxx.supabase.co';
     const CLOUD_KEY = 'sb_publishable_HyXPtAE9MaX01wBya036aQ_MZk5k842';
-    const APP_VERSION = '1.2.0';
+    const APP_VERSION = 'v1.3.0';
     let cloudDB = null;
 
     const BASE_DATA = {
