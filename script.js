@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://xtiqwwwitvcmbblqqnxx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_HyXPtAE9MaX01wBya036aQ_MZk5k842';
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+let supabaseClient = null;
 
 const BASE_DATA = {
     "rules": [
@@ -118,6 +118,14 @@ let planId = null;
 async function init() {
     const hashData = window.location.hash;
     const savedData = localStorage.getItem('comidas_data');
+
+    // Supabase Initialization
+    if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log("Supabase client initialized successfully.");
+    } else {
+        console.error("Supabase library NOT found in window. Check script tag in index.html.");
+    }
 
     // Supabase Load
     if (supabaseClient) {
