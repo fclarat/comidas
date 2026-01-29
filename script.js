@@ -118,6 +118,26 @@
     let editState = null;
     let expandedWeeks = new Set(); // Semana que están abiertas
 
+    function migrateData(data) {
+        if (!data) return null;
+        if (!data.weeks) return data;
+
+        data.weeks.forEach((w, i) => {
+            if (!w.shoppingList) {
+                w.shoppingList = JSON.parse(JSON.stringify(BASE_DATA.weeks[i].shoppingList));
+            }
+            w.shoppingList.forEach(item => {
+                if (item.quantity === undefined) item.quantity = "1";
+            });
+            // También asegurar que existan los campos de receta
+            w.days.forEach(day => {
+                if (day.lunchUrl === undefined) day.lunchUrl = "";
+                if (day.dinnerUrl === undefined) day.dinnerUrl = "";
+            });
+        });
+        return data;
+    }
+
     async function init() {
         setupEventListeners(); // Llamamos esto PRIMERO para que los botones siempre anden
         const hashData = window.location.hash;
@@ -138,7 +158,7 @@
                 const { data, error } = await cloudDB.from('meal_plans').select('id, data').limit(1).single();
                 if (!error && data) {
                     planId = data.id;
-                    currentData = data.data;
+                    currentData = migrateData(data.data);
                     if (Object.keys(currentData).length > 0) {
                         render();
                         saveLocalOnly();
@@ -159,7 +179,7 @@
         if (hashData && hashData.length > 1) {
             try {
                 const decoded = decodeURIComponent(escape(atob(hashData.substring(1))));
-                currentData = JSON.parse(decoded);
+                currentData = migrateData(JSON.parse(decoded));
                 render();
                 save();
                 window.history.replaceState(null, null, window.location.pathname);
@@ -171,27 +191,18 @@
         }
 
         if (savedData) {
-            currentData = JSON.parse(savedData);
-            // Migración: Asegurar que shoppingList existe y tiene cantidades
-            currentData.weeks.forEach((w, i) => {
-                if (!w.shoppingList) {
-                    w.shoppingList = JSON.parse(JSON.stringify(BASE_DATA.weeks[i].shoppingList));
-                }
-                w.shoppingList.forEach(item => {
-                    if (item.quantity === undefined) item.quantity = "1";
-                });
-            });
+            currentData = migrateData(JSON.parse(savedData));
             render();
         } else {
             try {
                 const response = await fetch('comidas.json');
                 if (response.ok) {
-                    currentData = await response.json();
+                    currentData = migrateData(await response.json());
                 } else {
                     throw new Error("Local fetch blocked");
                 }
             } catch (error) {
-                currentData = JSON.parse(JSON.stringify(BASE_DATA));
+                currentData = migrateData(JSON.parse(JSON.stringify(BASE_DATA)));
             }
             render();
             save();
@@ -475,13 +486,7 @@
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
-                    currentData = JSON.parse(event.target.result);
-                    // Migración rápida al importar
-                    currentData.weeks.forEach(w => {
-                        w.shoppingList.forEach(item => {
-                            if (item.quantity === undefined) item.quantity = "1";
-                        });
-                    });
+                    currentData = migrateData(JSON.parse(event.target.result));
                     render();
                     save();
                     alert("Importación exitosa.");
