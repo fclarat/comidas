@@ -50,38 +50,47 @@
             "shoppingList": [
                 {
                     "item": "Pollo (pechugas y muslos)",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Calabaza, Batata, Papas",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Brócoli, Zucchini",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Zanahorias, Tomates",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Lentejas",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Pescado blanco (Merluza)",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Arroz, Fideos tirabuzón",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Huevos, Queso crema, Queso fresco",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Harina, Levadura (para pizza/tarta)",
+                    "quantity": "1",
                     "checked": false
                 }
             ]
@@ -128,38 +137,47 @@
             "shoppingList": [
                 {
                     "item": "Ternera (Trozo para estofado)",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Solomillo de cerdo",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Pescado blanco",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Garbanzos, Lentejas, Arvejas",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Ricota, Queso, Huevos",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Espinaca, Berenjenas, Zapallitos",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Manzanas, Palta",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Polenta, Arroz, Fideos munición",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Atún al natural",
+                    "quantity": "1",
                     "checked": false
                 }
             ]
@@ -206,34 +224,42 @@
             "shoppingList": [
                 {
                     "item": "Pollo, Roast Beef",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Pescado",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Garbanzos",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Papas, Batatas, Berenjenas",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Tomates, Morrón, Cebolla",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Zapallito, Zanahoria",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Ricota, Queso crema, Jamón cocido",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Fideos cortos (Fideuá), Arroz",
+                    "quantity": "1",
                     "checked": false
                 }
             ]
@@ -280,34 +306,42 @@
             "shoppingList": [
                 {
                     "item": "Pollo (Supermas, Muslos)",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Pescado (Merluza)",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Espinaca, Calabaza, Zapallo",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Papas, Zanahorias",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Zucchini, Berenjena",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Arvejas partidas",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Arroz, Fideos tornillito, Cabellín",
+                    "quantity": "1",
                     "checked": false
                 },
                 {
                     "item": "Quesos, Huevos, Palta",
+                    "quantity": "1",
                     "checked": false
                 }
             ]

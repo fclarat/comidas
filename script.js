@@ -93,14 +93,14 @@
                     { "day": "Domingo", "lunch": "Comida libre familiar (opción segura: Pasta con salsa blanca)", "dinner": "Plan B: Arroz con huevo y palta" }
                 ],
                 "shoppingList": [
-                    { "item": "Pollo (Supermas, Muslos)", "checked": false },
-                    { "item": "Pescado (Merluza)", "checked": false },
-                    { "item": "Espinaca, Calabaza, Zapallo", "checked": false },
-                    { "item": "Papas, Zanahorias", "checked": false },
-                    { "item": "Zucchini, Berenjena", "checked": false },
-                    { "item": "Arvejas partidas", "checked": false },
-                    { "item": "Arroz, Fideos tornillito, Cabellín", "checked": false },
-                    { "item": "Quesos, Huevos, Palta", "checked": false }
+                    { "item": "Pollo (Supermas, Muslos)", "quantity": "1", "checked": false },
+                    { "item": "Pescado (Merluza)", "quantity": "1", "checked": false },
+                    { "item": "Espinaca, Calabaza, Zapallo", "quantity": "1", "checked": false },
+                    { "item": "Papas, Zanahorias", "quantity": "1", "checked": false },
+                    { "item": "Zucchini, Berenjena", "quantity": "1", "checked": false },
+                    { "item": "Arvejas partidas", "quantity": "1", "checked": false },
+                    { "item": "Arroz, Fideos tornillito, Cabellín", "quantity": "1", "checked": false },
+                    { "item": "Quesos, Huevos, Palta", "quantity": "1", "checked": false }
                 ]
             }
         ],
@@ -474,11 +474,19 @@
             reader.onload = (event) => {
                 try {
                     currentData = JSON.parse(event.target.result);
+                    // Migración rápida al importar
+                    currentData.weeks.forEach(w => {
+                        w.shoppingList.forEach(item => {
+                            if (item.quantity === undefined) item.quantity = "1";
+                        });
+                    });
                     render();
                     save();
+                    alert("Importación exitosa.");
                 } catch (err) {
                     alert("Error al procesar el archivo JSON.");
                 }
+                e.target.value = ''; // Resetear para permitir importar el mismo archivo
             };
             reader.readAsText(file);
         });
