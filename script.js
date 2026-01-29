@@ -113,6 +113,7 @@ const BASE_DATA = {
 };
 
 let currentData = null;
+let planId = null;
 
 async function init() {
     const hashData = window.location.hash;
@@ -122,18 +123,22 @@ async function init() {
     if (supabaseClient) {
         setCloudStatus("⏳ Conectando...", "syncing");
         try {
-            const { data, error } = await supabaseClient.from('meal_plans').select('data').limit(1).single();
-            if (!error && data && Object.keys(data.data).length > 0) {
+            const { data, error } = await supabaseClient.from('meal_plans').select('id, data').limit(1).single();
+            if (!error && data) {
+                planId = data.id;
                 currentData = data.data;
-                render();
-                saveLocalOnly();
-                setCloudStatus("☁️ Sincronizado", "synced");
-                return;
+                if (Object.keys(currentData).length > 0) {
+                    render();
+                    saveLocalOnly();
+                    setCloudStatus("☁️ Sincronizado", "synced");
+                    return;
+                }
             } else if (error && error.code !== 'PGRST116') {
-                console.warn("Supabase load error", error);
+                console.error("Supabase load error:", error);
                 setCloudStatus("☁️ Error DB", "error");
             }
         } catch (e) {
+            console.error("Supabase connection catch:", e);
             setCloudStatus("☁️ Error Red", "error");
         }
     }
@@ -193,14 +198,23 @@ async function save() {
     if (supabaseClient) {
         setCloudStatus("⏳ Sincronizando...", "syncing");
         try {
-            // Asumimos que hay un solo registro. En un app real usaríamos IDs.
-            const { error } = await supabaseClient.from('meal_plans').update({ data: currentData, updated_at: new Date() }).match({ id: 1 });
-            if (!error) {
+            let result;
+            if (planId) {
+                result = await supabaseClient.from('meal_plans').update({ data: currentData, updated_at: new Date() }).eq('id', planId);
+            } else {
+                // Fallback: intentar insertar si no había nada
+                result = await supabaseClient.from('meal_plans').insert([{ data: currentData }]).select();
+                if (!result.error && result.data) planId = result.data[0].id;
+            }
+
+            if (!result.error) {
                 setCloudStatus("☁️ Sincronizado", "synced");
             } else {
+                console.error("Supabase save error:", result.error);
                 setCloudStatus("☁️ Error al subir", "error");
             }
         } catch (e) {
+            console.error("Supabase save catch:", e);
             setCloudStatus("☁️ Error de red", "error");
         }
     }
