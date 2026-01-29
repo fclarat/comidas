@@ -544,3 +544,21 @@ button.secondary:hover {
         margin-bottom: 0.5rem;
     }
 }
+footer {
+    margin-top: 4rem;
+    padding: 2rem 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+footer p {
+    margin: 0;
+}
+
+#app-version {
+    font-weight: 600;
+    color: var(--primary);
+    margin-left: 2px;
+}

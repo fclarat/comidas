@@ -1,6 +1,7 @@
 (function () {
     const CLOUD_URL = 'https://xtiqwwwitvcmbblqqnxx.supabase.co';
     const CLOUD_KEY = 'sb_publishable_HyXPtAE9MaX01wBya036aQ_MZk5k842';
+    const APP_VERSION = '1.2.0';
     let cloudDB = null;
 
     const BASE_DATA = {
@@ -139,6 +140,10 @@
     }
 
     async function init() {
+        // Inyectar versión
+        const versionEl = document.getElementById('app-version');
+        if (versionEl) versionEl.textContent = APP_VERSION;
+
         setupEventListeners(); // Llamamos esto PRIMERO para que los botones siempre anden
         const hashData = window.location.hash;
         const savedData = localStorage.getItem('comidas_data');
