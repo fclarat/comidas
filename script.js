@@ -119,6 +119,7 @@
     let expandedWeeks = new Set(); // Semana que están abiertas
 
     async function init() {
+        setupEventListeners(); // Llamamos esto PRIMERO para que los botones siempre anden
         const hashData = window.location.hash;
         const savedData = localStorage.getItem('comidas_data');
 
@@ -142,6 +143,7 @@
                         render();
                         saveLocalOnly();
                         setCloudStatus("☁️ Sincronizado", "synced");
+                        // setupEventListeners already called at top
                         return;
                     }
                 } else if (error && error.code !== 'PGRST116') {
