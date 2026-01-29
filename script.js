@@ -111,7 +111,24 @@ const BASE_DATA = {
 let currentData = null;
 
 async function init() {
+    const hashData = window.location.hash;
     const savedData = localStorage.getItem('comidas_data');
+
+    if (hashData && hashData.length > 1) {
+        try {
+            const decoded = decodeURIComponent(escape(atob(hashData.substring(1))));
+            currentData = JSON.parse(decoded);
+            render();
+            save(); // Guardamos lo que vino por URL en el navegador
+            // Limpiamos el hash para que no quede la URL gigante
+            window.history.replaceState(null, null, window.location.pathname);
+            showSaveStatus("✓ Sincronizado desde el link");
+            return;
+        } catch (e) {
+            console.error("Error decoding hash data", e);
+        }
+    }
+
     if (savedData) {
         currentData = JSON.parse(savedData);
         // Migración simple para añadir shoppingList si no existe
@@ -233,6 +250,24 @@ function addShoppingItem(wIdx) {
 }
 
 function setupEventListeners() {
+    document.getElementById('share-btn').addEventListener('click', () => {
+        const json = JSON.stringify(currentData);
+        const encoded = btoa(unescape(encodeURIComponent(json)));
+        const baseUrl = window.location.href.split('#')[0];
+        const shareUrl = baseUrl + "#" + encoded;
+
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            const btn = document.getElementById('share-btn');
+            const originalText = btn.textContent;
+            btn.textContent = "🔗 ¡Link Copiado!";
+            setTimeout(() => btn.textContent = originalText, 2000);
+            alert("¡Link de sincronización copiado! Pásalo por WhatsApp. Cuando la otra persona lo abra, se le actualizará su plan con el tuyo.");
+        }).catch(err => {
+            alert("No se pudo copiar el link. Los datos son muy largos para este método.");
+            console.error(err);
+        });
+    });
+
     document.getElementById('copy-btn').addEventListener('click', () => {
         const json = JSON.stringify(currentData, null, 2);
         navigator.clipboard.writeText(json).then(() => {
