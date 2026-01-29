@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://xtiqwwwitvcmbblqqnxx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_HyXPtAE9MaX01wBya036aQ_MZk5k842';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 const BASE_DATA = {
     "rules": [
@@ -119,10 +119,10 @@ async function init() {
     const savedData = localStorage.getItem('comidas_data');
 
     // Supabase Load
-    if (supabase) {
+    if (supabaseClient) {
         setCloudStatus("⏳ Conectando...", "syncing");
         try {
-            const { data, error } = await supabase.from('meal_plans').select('data').limit(1).single();
+            const { data, error } = await supabaseClient.from('meal_plans').select('data').limit(1).single();
             if (!error && data && Object.keys(data.data).length > 0) {
                 currentData = data.data;
                 render();
@@ -190,11 +190,11 @@ async function save() {
     showSaveStatus();
 
     // Save Cloud
-    if (supabase) {
+    if (supabaseClient) {
         setCloudStatus("⏳ Sincronizando...", "syncing");
         try {
             // Asumimos que hay un solo registro. En un app real usaríamos IDs.
-            const { error } = await supabase.from('meal_plans').update({ data: currentData, updated_at: new Date() }).match({ id: 1 });
+            const { error } = await supabaseClient.from('meal_plans').update({ data: currentData, updated_at: new Date() }).match({ id: 1 });
             if (!error) {
                 setCloudStatus("☁️ Sincronizado", "synced");
             } else {
