@@ -115,6 +115,7 @@
 
     let currentData = null;
     let planId = null;
+    let editState = null; // Para saber qué estamos editando en el modal
 
     async function init() {
         const hashData = window.location.hash;
@@ -168,8 +169,14 @@
 
         if (savedData) {
             currentData = JSON.parse(savedData);
+            // Migración: Asegurar que shoppingList existe y tiene cantidades
             currentData.weeks.forEach((w, i) => {
-                if (!w.shoppingList) w.shoppingList = JSON.parse(JSON.stringify(BASE_DATA.weeks[i].shoppingList));
+                if (!w.shoppingList) {
+                    w.shoppingList = JSON.parse(JSON.stringify(BASE_DATA.weeks[i].shoppingList));
+                }
+                w.shoppingList.forEach(item => {
+                    if (item.quantity === undefined) item.quantity = "1";
+                });
             });
             render();
         } else {
@@ -275,13 +282,18 @@
             <div class="shopping-list-section">
                 <div class="shopping-list-title">
                     <span>🛒 Lista de Compras</span>
-                    <button class="add-item-btn" onclick="addShoppingItem(${wIdx})">+ Sugerir/Agregar</button>
+                    <button class="add-item-btn" onclick="addShoppingItem(${wIdx})">+ Agregar</button>
+                </div>
+                <div class="shopping-list-header">
+                    <span class="col-item">Producto</span>
+                    <span class="col-qty">Cant.</span>
                 </div>
                 <ul class="shopping-list">
                     ${week.shoppingList.map((item, iIdx) => `
                         <li class="shopping-item ${item.checked ? 'checked' : ''}" onclick="toggleShoppingItem(${wIdx}, ${iIdx})">
                             <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleShoppingItem(${wIdx}, ${iIdx})">
-                            <span>${item.item}</span>
+                            <span class="item-text">${item.item}</span>
+                            <span class="item-qty" onclick="event.stopPropagation(); editQuantity(${wIdx}, ${iIdx})">${item.quantity || '1'}</span>
                         </li>
                     `).join('')}
                 </ul>
@@ -298,13 +310,43 @@
 
     function editMeal(weekIdx, dayIdx, type) {
         const currentValue = currentData.weeks[weekIdx].days[dayIdx][type];
-        const newValue = prompt(`Editar ${type === 'lunch' ? 'almuerzo' : 'cena'}:`, currentValue);
+        editState = { type: 'meal', weekIdx, dayIdx, field: type };
+        openModal(`Editar ${type === 'lunch' ? 'Almuerzo' : 'Cena'}`, currentValue);
+    }
 
-        if (newValue !== null && newValue.trim() !== "") {
-            currentData.weeks[weekIdx].days[dayIdx][type] = newValue.trim();
+    function editQuantity(wIdx, iIdx) {
+        const item = currentData.weeks[wIdx].shoppingList[iIdx];
+        const newQty = prompt(`Cantidad para "${item.item}":`, item.quantity || "1");
+        if (newQty !== null) {
+            item.quantity = newQty.trim() || "1";
             render();
             save();
         }
+    }
+
+    function openModal(title, value) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('edit-input').value = value;
+        document.getElementById('edit-modal').classList.add('active');
+        document.getElementById('edit-input').focus();
+    }
+
+    function closeModal() {
+        document.getElementById('edit-modal').classList.remove('active');
+        editState = null;
+    }
+
+    function saveModal() {
+        if (!editState) return;
+        const newValue = document.getElementById('edit-input').value.trim();
+
+        if (editState.type === 'meal') {
+            currentData.weeks[editState.weekIdx].days[editState.dayIdx][editState.field] = newValue;
+        }
+
+        render();
+        save();
+        closeModal();
     }
 
     function toggleShoppingItem(wIdx, iIdx) {
@@ -314,9 +356,14 @@
     }
 
     function addShoppingItem(wIdx) {
-        const newItem = prompt("Nuevo item para la lista de compras:");
+        const newItem = prompt("Nuevo producto:");
         if (newItem && newItem.trim() !== "") {
-            currentData.weeks[wIdx].shoppingList.push({ item: newItem.trim(), checked: false });
+            const qty = prompt("Cantidad (opcional):", "1");
+            currentData.weeks[wIdx].shoppingList.push({
+                item: newItem.trim(),
+                quantity: qty ? qty.trim() : "1",
+                checked: false
+            });
             render();
             save();
         }
@@ -388,6 +435,14 @@
                 save();
             }
         });
+
+        // Modal Listeners
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-cancel').addEventListener('click', closeModal);
+        document.getElementById('modal-save').addEventListener('click', saveModal);
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('edit-modal')) closeModal();
+        });
     }
 
     document.addEventListener('DOMContentLoaded', init);
@@ -396,4 +451,5 @@
     window.editMeal = editMeal;
     window.toggleShoppingItem = toggleShoppingItem;
     window.addShoppingItem = addShoppingItem;
+    window.editQuantity = editQuantity;
 })();
