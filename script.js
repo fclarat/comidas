@@ -115,7 +115,8 @@
 
     let currentData = null;
     let planId = null;
-    let editState = null; // Para saber qué estamos editando en el modal
+    let editState = null;
+    let expandedWeeks = new Set(); // Semana que están abiertas
 
     async function init() {
         const hashData = window.location.hash;
@@ -249,12 +250,40 @@
 
     function setCloudStatus(text, className) {
         const status = document.getElementById('cloud-status');
-        status.textContent = text;
-        status.className = "cloud-status " + className;
+        if (status) {
+            status.textContent = text;
+            status.className = "cloud-status " + className;
+        }
+    }
+
+    function getCurrentWeekIdx() {
+        if (!currentData || !currentData.startDate) return 0;
+        const start = new Date(currentData.startDate);
+        const today = new Date();
+        const diffTime = today - start;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays < 0) return 0; // Aún no empezó
+        const weekIdx = Math.floor(diffDays / 7);
+        return Math.min(weekIdx, currentData.weeks.length - 1);
+    }
+
+    function toggleWeek(idx) {
+        if (expandedWeeks.has(idx)) {
+            expandedWeeks.delete(idx);
+        } else {
+            expandedWeeks.add(idx);
+        }
+        render();
     }
 
     function render() {
         if (!currentData) return;
+
+        const currentWeekIdx = getCurrentWeekIdx();
+        // Si es la primera vez, expandir la actual
+        if (expandedWeeks.size === 0) {
+            expandedWeeks.add(currentWeekIdx);
+        }
 
         // Rules
         const rulesList = document.getElementById('rules-list');
@@ -262,44 +291,58 @@
 
         // Calendar
         const container = document.getElementById('calendar-container');
-        container.innerHTML = currentData.weeks.map((week, wIdx) => `
-        <div class="week-section">
-            <div class="week-title">Semana ${week.weekNumber}</div>
-            ${week.days.map((day, dIdx) => `
-                <div class="day-row">
-                    <div class="day-label">${day.day}</div>
-                    <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'lunch')">
-                        <div class="label">Almuerzo (Doble clic)</div>
-                        <span>${day.lunch}</span>
+        container.innerHTML = currentData.weeks.map((week, wIdx) => {
+            const isExpanded = expandedWeeks.has(wIdx);
+            const isCurrent = (wIdx === currentWeekIdx);
+
+            return `
+            <div class="week-section ${!isExpanded ? 'collapsed' : ''} ${isCurrent ? 'current' : ''}">
+                <div class="week-header" onclick="toggleWeek(${wIdx})">
+                    <div class="week-title">
+                        Semana ${week.weekNumber}
+                        <span class="week-badge">Semana Actual</span>
                     </div>
-                    <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'dinner')">
-                        <div class="label">Cena (Doble clic)</div>
-                        <span>${day.dinner}</span>
-                    </div>
+                    <span class="expand-icon">🔽</span>
                 </div>
-            `).join('')}
-            
-            <div class="shopping-list-section">
-                <div class="shopping-list-title">
-                    <span>🛒 Lista de Compras</span>
-                    <button class="add-item-btn" onclick="addShoppingItem(${wIdx})">+ Agregar</button>
-                </div>
-                <div class="shopping-list-header">
-                    <span class="col-item">Producto</span>
-                    <span class="col-qty">Cant.</span>
-                </div>
-                <ul class="shopping-list">
-                    ${week.shoppingList.map((item, iIdx) => `
-                        <li class="shopping-item ${item.checked ? 'checked' : ''}" onclick="toggleShoppingItem(${wIdx}, ${iIdx})">
-                            <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleShoppingItem(${wIdx}, ${iIdx})">
-                            <span class="item-text">${item.item}</span>
-                            <span class="item-qty" onclick="event.stopPropagation(); editQuantity(${wIdx}, ${iIdx})">${item.quantity || '1'}</span>
-                        </li>
+                
+                <div class="week-content">
+                    ${week.days.map((day, dIdx) => `
+                        <div class="day-row">
+                            <div class="day-label">${day.day}</div>
+                            <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'lunch')">
+                                <div class="label">Almuerzo (Doble clic)</div>
+                                <span>${day.lunch}</span>
+                            </div>
+                            <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'dinner')">
+                                <div class="label">Cena (Doble clic)</div>
+                                <span>${day.dinner}</span>
+                            </div>
+                        </div>
                     `).join('')}
-                </ul>
+                    
+                    <div class="shopping-list-section">
+                        <div class="shopping-list-title">
+                            <span>🛒 Lista de Compras</span>
+                            <button class="add-item-btn" onclick="addShoppingItem(${wIdx})">+ Agregar</button>
+                        </div>
+                        <div class="shopping-list-header">
+                            <span class="col-item">Producto</span>
+                            <span class="col-qty">Cant.</span>
+                        </div>
+                        <ul class="shopping-list">
+                            ${week.shoppingList.map((item, iIdx) => `
+                                <li class="shopping-item ${item.checked ? 'checked' : ''}" onclick="toggleShoppingItem(${wIdx}, ${iIdx})">
+                                    <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleShoppingItem(${wIdx}, ${iIdx})">
+                                    <span class="item-text">${item.item}</span>
+                                    <span class="item-qty" onclick="event.stopPropagation(); editQuantity(${wIdx}, ${iIdx})">${item.quantity || '1'}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+        }).join('');
 
         // Backups
         const backupsList = document.getElementById('backups-list');
@@ -452,4 +495,7 @@
     window.toggleShoppingItem = toggleShoppingItem;
     window.addShoppingItem = addShoppingItem;
     window.editQuantity = editQuantity;
+    window.toggleWeek = toggleWeek;
+    window.closeModal = closeModal;
+    window.saveModal = saveModal;
 })();

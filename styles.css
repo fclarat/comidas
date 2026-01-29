@@ -150,13 +150,76 @@ button.secondary:hover {
     border: 1px solid var(--border);
 }
 
+/* Weekly Focus / Accordion */
+.week-section {
+    background: white;
+    padding: 0;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.week-section.collapsed {
+    opacity: 0.7;
+}
+
+.week-header {
+    background: var(--bg-main);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.week-header:hover {
+    background: #e2e8f0;
+}
+
 .week-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 1rem;
     color: var(--primary);
-    border-bottom: 2px solid var(--bg-main);
-    padding-bottom: 0.5rem;
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+.week-badge {
+    font-size: 0.7rem;
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 10px;
+    display: none;
+}
+
+.week-section.current .week-badge {
+    display: inline-block;
+}
+
+.week-content {
+    padding: 1.5rem;
+    display: block;
+}
+
+.week-section.collapsed .week-content {
+    display: none;
+}
+
+.expand-icon {
+    transition: transform 0.3s;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.week-section.collapsed .expand-icon {
+    transform: rotate(-90deg);
 }
 
 .day-row {

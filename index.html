@@ -52,14 +52,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modal-title">Editar Comida</h2>
-                <button class="close-btn" id="modal-close">&times;</button>
+                <button class="close-btn" id="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <textarea id="edit-input" rows="4"></textarea>
             </div>
             <div class="modal-footer">
-                <button class="secondary" id="modal-cancel">Cancelar</button>
-                <button id="modal-save">Guardar Cambios</button>
+                <button class="secondary" id="modal-cancel" onclick="closeModal()">Cancelar</button>
+                <button id="modal-save" onclick="saveModal()">Guardar Cambios</button>
             </div>
         </div>
     </div>
