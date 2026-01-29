@@ -137,20 +137,11 @@ button.secondary:hover {
 }
 
 .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    display: block;
+    width: 100%;
 }
 
-.week-section {
-    background: var(--bg-card);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-}
-
-/* Weekly Focus / Accordion */
+/* Week Section Base (Merged) */
 .week-section {
     background: white;
     padding: 0;
@@ -160,7 +151,10 @@ button.secondary:hover {
     overflow: hidden;
     border: 1px solid var(--border);
     transition: all 0.3s ease;
+    width: 100%;
 }
+
+/* Weekly Focus / Accordion */
 
 .week-section.collapsed {
     opacity: 0.6;
