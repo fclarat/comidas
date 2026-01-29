@@ -163,7 +163,16 @@ button.secondary:hover {
 }
 
 .week-section.collapsed {
-    opacity: 0.7;
+    opacity: 0.6;
+    margin-bottom: 0.5rem;
+    border-color: #cbd5e1;
+}
+
+.week-section.current {
+    width: 100%;
+    margin-bottom: 2rem;
+    border: 2px solid var(--primary);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .week-header {
@@ -178,6 +187,19 @@ button.secondary:hover {
 
 .week-header:hover {
     background: #e2e8f0;
+}
+
+.week-section.current .week-header {
+    background: linear-gradient(90deg, var(--primary), #3b82f6);
+}
+
+.week-section.current .week-title {
+    color: white;
+}
+
+.week-section.current .expand-icon {
+    color: white;
+    filter: brightness(0) invert(1);
 }
 
 .week-title {
@@ -210,6 +232,11 @@ button.secondary:hover {
 
 .week-section.collapsed .week-content {
     display: none;
+}
+
+.week-section.current .week-content {
+    padding: 2rem;
+    background: linear-gradient(to bottom, #ffffff, #f8fafc);
 }
 
 .expand-icon {
