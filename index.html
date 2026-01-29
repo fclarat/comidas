@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan de Comidas Familiares</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -22,8 +23,11 @@
         </section>
 
         <div class="controls">
-            <span id="save-status" class="save-status">✓ Guardado en navegador</span>
-            <button class="secondary" id="share-btn">🔗 Compartir / Sincronizar</button>
+            <div class="sync-info">
+                <span id="save-status" class="save-status">✓ Local</span>
+                <span id="cloud-status" class="cloud-status">☁️ Desconectado</span>
+            </div>
+            <button class="secondary" id="share-btn">🔗 Compartir link</button>
             <button class="secondary" id="reset-btn">🔄 Resetear</button>
             <button class="secondary" id="copy-btn">📋 Copiar JSON</button>
             <button class="secondary" id="import-btn">📥 Importar</button>

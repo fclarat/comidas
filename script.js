@@ -1,3 +1,7 @@
+const SUPABASE_URL = 'https://xtiqwwwitvcmbblqqnxx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_HyXPtAE9MaX01wBya036aQ_MZk5k842';
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
 const BASE_DATA = {
     "rules": [
         "❌ Nada de miel (Riesgo de botulismo < 2 años)",
@@ -114,13 +118,32 @@ async function init() {
     const hashData = window.location.hash;
     const savedData = localStorage.getItem('comidas_data');
 
+    // Supabase Load
+    if (supabase) {
+        setCloudStatus("⏳ Conectando...", "syncing");
+        try {
+            const { data, error } = await supabase.from('meal_plans').select('data').limit(1).single();
+            if (!error && data && Object.keys(data.data).length > 0) {
+                currentData = data.data;
+                render();
+                saveLocalOnly();
+                setCloudStatus("☁️ Sincronizado", "synced");
+                return;
+            } else if (error && error.code !== 'PGRST116') {
+                console.warn("Supabase load error", error);
+                setCloudStatus("☁️ Error DB", "error");
+            }
+        } catch (e) {
+            setCloudStatus("☁️ Error Red", "error");
+        }
+    }
+
     if (hashData && hashData.length > 1) {
         try {
             const decoded = decodeURIComponent(escape(atob(hashData.substring(1))));
             currentData = JSON.parse(decoded);
             render();
-            save(); // Guardamos lo que vino por URL en el navegador
-            // Limpiamos el hash para que no quede la URL gigante
+            save();
             window.history.replaceState(null, null, window.location.pathname);
             showSaveStatus("✓ Sincronizado desde el link");
             return;
@@ -131,7 +154,6 @@ async function init() {
 
     if (savedData) {
         currentData = JSON.parse(savedData);
-        // Migración simple para añadir shoppingList si no existe
         currentData.weeks.forEach((w, i) => {
             if (!w.shoppingList) w.shoppingList = JSON.parse(JSON.stringify(BASE_DATA.weeks[i].shoppingList));
         });
@@ -142,10 +164,9 @@ async function init() {
             if (response.ok) {
                 currentData = await response.json();
             } else {
-                throw new Error("Local fetch blocked or file not found");
+                throw new Error("Local fetch blocked");
             }
         } catch (error) {
-            console.warn("Using fallback data due to fetch error (likely CORS or file missing).", error);
             currentData = JSON.parse(JSON.stringify(BASE_DATA));
         }
         render();
@@ -155,22 +176,51 @@ async function init() {
     setupEventListeners();
 }
 
-function save() {
+function saveLocalOnly() {
     if (currentData) {
         localStorage.setItem('comidas_data', JSON.stringify(currentData));
-        showSaveStatus();
     }
 }
 
-function showSaveStatus() {
+async function save() {
+    if (!currentData) return;
+
+    // Save Local
+    localStorage.setItem('comidas_data', JSON.stringify(currentData));
+    showSaveStatus();
+
+    // Save Cloud
+    if (supabase) {
+        setCloudStatus("⏳ Sincronizando...", "syncing");
+        try {
+            // Asumimos que hay un solo registro. En un app real usaríamos IDs.
+            const { error } = await supabase.from('meal_plans').update({ data: currentData, updated_at: new Date() }).match({ id: 1 });
+            if (!error) {
+                setCloudStatus("☁️ Sincronizado", "synced");
+            } else {
+                setCloudStatus("☁️ Error al subir", "error");
+            }
+        } catch (e) {
+            setCloudStatus("☁️ Error de red", "error");
+        }
+    }
+}
+
+function showSaveStatus(message = "✓ Local") {
     const status = document.getElementById('save-status');
-    status.textContent = "⏳ Guardando...";
+    status.textContent = "⏳...";
     status.classList.add('saving');
 
     setTimeout(() => {
-        status.textContent = "✓ Guardado en navegador";
+        status.textContent = message;
         status.classList.remove('saving');
-    }, 800);
+    }, 600);
+}
+
+function setCloudStatus(text, className) {
+    const status = document.getElementById('cloud-status');
+    status.textContent = text;
+    status.className = "cloud-status " + className;
 }
 
 function render() {
@@ -261,9 +311,8 @@ function setupEventListeners() {
             const originalText = btn.textContent;
             btn.textContent = "🔗 ¡Link Copiado!";
             setTimeout(() => btn.textContent = originalText, 2000);
-            alert("¡Link de sincronización copiado! Pásalo por WhatsApp. Cuando la otra persona lo abra, se le actualizará su plan con el tuyo.");
+            alert("¡Link de sincronización copiado! Pásalo por WhatsApp. Útil para primera sincronización rápida.");
         }).catch(err => {
-            alert("No se pudo copiar el link. Los datos son muy largos para este método.");
             console.error(err);
         });
     });
@@ -272,12 +321,8 @@ function setupEventListeners() {
         const json = JSON.stringify(currentData, null, 2);
         navigator.clipboard.writeText(json).then(() => {
             const btn = document.getElementById('copy-btn');
-            const originalText = btn.textContent;
             btn.textContent = "✅ ¡Copiado!";
-            setTimeout(() => btn.textContent = originalText, 2000);
-        }).catch(err => {
-            alert("No se pudo copiar al portapapeles. Mira la consola.");
-            console.error(err);
+            setTimeout(() => btn.textContent = "📋 Copiar JSON", 2000);
         });
     });
 
@@ -313,14 +358,9 @@ function setupEventListeners() {
     });
 
     document.getElementById('reset-btn').addEventListener('click', async () => {
-        if (confirm("¿Estás seguro de que quieres resetear todo a la planificación base? Se perderán tus cambios actuales.")) {
+        if (confirm("¿Estás seguro de que quieres resetear todo a la planificación base? Se perderán tus cambios actuales en la nube.")) {
             localStorage.removeItem('comidas_data');
-            const response = await fetch('comidas.json');
-            if (response.ok) {
-                currentData = await response.json();
-            } else {
-                currentData = JSON.parse(JSON.stringify(BASE_DATA));
-            }
+            currentData = JSON.parse(JSON.stringify(BASE_DATA));
             render();
             save();
         }
