@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Comidas Familiares</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🍱 Menú Familiar</h1>
+            <p>Planificación mensual adaptable para Alma y adultos</p>
+        </header>
+
+        <section class="rules-banner">
+            <ul id="rules-list" class="rules-list">
+                <!-- Reglas cargadas desde JSON -->
+            </ul>
+        </section>
+
+        <div class="controls">
+            <span id="save-status" class="save-status">✓ Guardado en navegador</span>
+            <button class="secondary" id="reset-btn">🔄 Resetear</button>
+            <button class="secondary" id="copy-btn">📋 Copiar JSON</button>
+            <button class="secondary" id="import-btn">📥 Importar</button>
+            <button id="export-btn">📤 Descargar</button>
+            <input type="file" id="file-input" style="display: none;" accept=".json">
+        </div>
+
+        <main id="calendar-container" class="calendar-grid">
+            <!-- Semanas cargadas dinámicamente -->
+        </main>
+
+        <section class="backups-section">
+            <h2>🆘 Planes B (Rápidos)</h2>
+            <div id="backups-list" class="backups-list">
+                <!-- Planes B cargados desde JSON -->
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
