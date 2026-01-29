@@ -261,12 +261,12 @@
             ${week.days.map((day, dIdx) => `
                 <div class="day-row">
                     <div class="day-label">${day.day}</div>
-                    <div class="meal-slot" onclick="editMeal(${wIdx}, ${dIdx}, 'lunch')">
-                        <div class="label">Almuerzo</div>
+                    <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'lunch')">
+                        <div class="label">Almuerzo (Doble clic)</div>
                         <span>${day.lunch}</span>
                     </div>
-                    <div class="meal-slot" onclick="editMeal(${wIdx}, ${dIdx}, 'dinner')">
-                        <div class="label">Cena</div>
+                    <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'dinner')">
+                        <div class="label">Cena (Doble clic)</div>
                         <span>${day.dinner}</span>
                     </div>
                 </div>
@@ -391,4 +391,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', init);
+
+    // Exponer funciones globales para el HTML onclick/ondblclick
+    window.editMeal = editMeal;
+    window.toggleShoppingItem = toggleShoppingItem;
+    window.addShoppingItem = addShoppingItem;
 })();
