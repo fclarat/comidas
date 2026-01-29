@@ -55,7 +55,15 @@
                 <button class="close-btn" id="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <textarea id="edit-input" rows="4"></textarea>
+                <label for="edit-input"
+                    style="display:block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600;">Comida:</label>
+                <textarea id="edit-input" rows="4" style="margin-bottom: 1rem;"></textarea>
+
+                <label for="edit-link"
+                    style="display:block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600;">Link de Receta
+                    (opcional):</label>
+                <input type="url" id="edit-link" placeholder="https://ejemplo.com/receta"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--bg-main);">
             </div>
             <div class="modal-footer">
                 <button class="secondary" id="modal-cancel" onclick="closeModal()">Cancelar</button>

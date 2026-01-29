@@ -306,19 +306,28 @@
                 </div>
                 
                 <div class="week-content">
-                    ${week.days.map((day, dIdx) => `
+                    <div class="week-grid-header">
+                        <div>Día</div>
+                        <div>Almuerzo</div>
+                        <div>Cena</div>
+                    </div>
+                    ${week.days.map((day, dIdx) => {
+                const lunchUrl = day.lunchUrl || "";
+                const dinnerUrl = day.dinnerUrl || "";
+
+                return `
                         <div class="day-row">
                             <div class="day-label">${day.day}</div>
                             <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'lunch')">
-                                <div class="label">Almuerzo (Doble clic)</div>
                                 <span>${day.lunch}</span>
+                                ${lunchUrl ? `<a href="${lunchUrl}" target="_blank" class="recipe-link" onclick="event.stopPropagation()">🔗 Receta</a>` : ''}
                             </div>
                             <div class="meal-slot" ondblclick="editMeal(${wIdx}, ${dIdx}, 'dinner')">
-                                <div class="label">Cena (Doble clic)</div>
                                 <span>${day.dinner}</span>
+                                ${dinnerUrl ? `<a href="${dinnerUrl}" target="_blank" class="recipe-link" onclick="event.stopPropagation()">🔗 Receta</a>` : ''}
                             </div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                     
                     <div class="shopping-list-section">
                         <div class="shopping-list-title">
@@ -353,8 +362,9 @@
 
     function editMeal(weekIdx, dayIdx, type) {
         const currentValue = currentData.weeks[weekIdx].days[dayIdx][type];
+        const currentUrl = currentData.weeks[weekIdx].days[dayIdx][type + 'Url'] || "";
         editState = { type: 'meal', weekIdx, dayIdx, field: type };
-        openModal(`Editar ${type === 'lunch' ? 'Almuerzo' : 'Cena'}`, currentValue);
+        openModal(`Editar ${type === 'lunch' ? 'Almuerzo' : 'Cena'}`, currentValue, currentUrl);
     }
 
     function editQuantity(wIdx, iIdx) {
@@ -367,9 +377,10 @@
         }
     }
 
-    function openModal(title, value) {
+    function openModal(title, value, url = "") {
         document.getElementById('modal-title').textContent = title;
         document.getElementById('edit-input').value = value;
+        document.getElementById('edit-link').value = url;
         document.getElementById('edit-modal').classList.add('active');
         document.getElementById('edit-input').focus();
     }
@@ -382,9 +393,11 @@
     function saveModal() {
         if (!editState) return;
         const newValue = document.getElementById('edit-input').value.trim();
+        const newUrl = document.getElementById('edit-link').value.trim();
 
         if (editState.type === 'meal') {
             currentData.weeks[editState.weekIdx].days[editState.dayIdx][editState.field] = newValue;
+            currentData.weeks[editState.weekIdx].days[editState.dayIdx][editState.field + 'Url'] = newUrl;
         }
 
         render();
